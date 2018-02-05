@@ -1,0 +1,21 @@
+﻿#pragma kernel update
+
+#include "ParticleSystem.Particle.cginc"
+
+RWStructuredBuffer<Particle> _ParticlesIN;
+RWStructuredBuffer<Particle> _ParticlesOUT;
+float dt;
+float3 mousePos;
+float attraction;
+
+[numthreads(8, 1, 1)]
+void update(uint3 id : SV_DispatchThreadID)
+{
+    Particle p = _ParticlesIN[id.x];
+    float3 to = mousePos - p.position;
+    float dst = max(0.0001, length(to));
+    float3 force = normalize(to) / dst;
+    p.velocity += force * attraction;
+    p.startColor = p.position.x;
+    _ParticlesOUT[id.x] = p;
+}
