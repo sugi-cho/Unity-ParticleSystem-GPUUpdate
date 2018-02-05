@@ -1,4 +1,5 @@
 # Unity-ParticleSystem-GPUUpdate
+
 Update built-in ParticleSystem with ComputeShader
 
 ## ParticleSystem.Particle for shader
@@ -15,3 +16,15 @@ Update built-in ParticleSystem with ComputeShader
 [GPU処理](https://github.com/sugi-cho/Unity-ParticleSystem-GPUUpdate/blob/master/Assets/ParticleSystem-GPU/Scripts/ParticleGPUUpdate.cs#L57-L74)
 
 ComputeBufferから直接パーティクル情報をSetできる何かあると良いな
+
+![gpu](imgs/gpu-update.png)
+
+GPU処理時
+
+---
+
+![cpu](imgs/cpu-update.png)
+
+CPU処理時
+
+パーティクル数は、約25000
