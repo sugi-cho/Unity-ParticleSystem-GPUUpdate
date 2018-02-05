@@ -51,7 +51,8 @@ public class ParticleGPUUpdate : MonoBehaviour
 
         if (useCPU)
             CPUUpdate();
-        GPUUpdate();
+        else
+            GPUUpdate();
     }
 
     void GPUUpdate()
@@ -59,7 +60,7 @@ public class ParticleGPUUpdate : MonoBehaviour
         var numParticles = pSystem.GetParticles(particlesIN);
         var kernel = updater.FindKernel("update");
         var threadsX = Mathf.CeilToInt(numParticles / 8f);
-        
+
         particlesINBuffer.SetData(particlesIN, 0, 0, numParticles);
         updater.SetBuffer(kernel, "_ParticlesIN", particlesINBuffer);
         updater.SetBuffer(kernel, "_ParticlesOUT", particlesOUTBuffer);
@@ -76,7 +77,7 @@ public class ParticleGPUUpdate : MonoBehaviour
     void CPUUpdate()
     {
         var numParticles = pSystem.GetParticles(particlesIN);
-        for(var i = 0; i < numParticles; i++)
+        for (var i = 0; i < numParticles; i++)
         {
             var p = particlesIN[i];
 
