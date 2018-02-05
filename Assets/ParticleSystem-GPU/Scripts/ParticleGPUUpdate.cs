@@ -45,7 +45,7 @@ public class ParticleGPUUpdate : MonoBehaviour
     private void Update()
     {
         mousePos = Input.mousePosition;
-        mousePos.z = 5f;
+        mousePos.z = 15f;
         mousePos = camera.ScreenToWorldPoint(mousePos);
         attraction = Input.GetMouseButton(0) ? 0.5f : 0f;
 

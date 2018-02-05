@@ -17,7 +17,7 @@ struct Particle
     uint startColor; //Color32の代わり
     uint randomSeed;
 //  float startSize;
-// Debug.Log(structSize); => 120なので、floatかint、1個分多い
+// sizeof(ParticleSystem.Particle) = 120なので、floatかint、1個分多いので、とりあえずstartSizeをコメントアウトしてみた
 // この並び順は、UnityEngine.ParticleSystem.ParticleのメタデータのStructの逆順。
 };
 
