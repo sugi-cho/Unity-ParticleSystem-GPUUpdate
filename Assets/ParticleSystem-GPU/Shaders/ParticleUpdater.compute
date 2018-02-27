@@ -1,4 +1,5 @@
 ﻿#pragma kernel update
+#pragma kernel bridge
 
 #include "ParticleSystem.Particle.cginc"
 
@@ -17,5 +18,24 @@ void update(uint3 id : SV_DispatchThreadID)
     float3 force = normalize(to) / dst;
     p.velocity += force * attraction;
     p.startColor = p.position.x;
+    _ParticlesOUT[id.x] = p;
+}
+
+[numthreads(16, 1, 1)]
+void bridge(uint3 id : SV_DispatchThreadID)
+{
+    Particle p = (Particle) 0;
+    p.position = half3(1, 1, 1);
+    p.velocity = half3(1, 1, 1);
+    p.animatedVelocity = half3(1, 1, 1);
+    p.totalVelocity = half3(1, 1, 1);
+    p.axisOfRotation.xyz = half3(0, 1, 2);
+    p.rotation3D = half3(0, 1, 2); //C#上でparticle.rotation3Dは、1rad = 57.29578degに、変換される。つまり、ラジアンで入力する
+    p.angularVelocity3D = half3(2, 1, 0.5);
+    p.startSize3D = half3(2, 3, 1);
+    p.startColor = Particle_ColorToUint(half4(1.0, 0.5, 0.75, 0.5));
+    p.randomSeed = 2;
+    p.remainingLifetime = 10;
+    p.startLifetime = 20;
     _ParticlesOUT[id.x] = p;
 }
