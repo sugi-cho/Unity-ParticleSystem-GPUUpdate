@@ -5,7 +5,7 @@ struct Particle
     float3 position;
     float3 velocity;
     float3 animatedVelocity;
-    float3 totalVelocity; //velocityとanimatedの足し算。自動的
+    float3 unused_totalVelocity; //velocityとanimatedの足し算。自動的に計算される
     float3 axisOfRotation;
     float3 rotation3D;
     float3 angularVelocity3D;
@@ -14,11 +14,11 @@ struct Particle
     uint randomSeed;
     float remainingLifetime;
     float startLifetime;
-    float rotation; //rotation3Dから、自動的に設定されるぽい
-    float angularVelocity; //angularVelociry3Dから、自動設定
+    float unused_rotation; //rotation3Dから、自動的に設定されるぽい
+    float unused_angularVelocity; //angularVelociry3Dから、自動設定
     //float startSize;
-// sizeof(ParticleSystem.Particle) = 120なので、floatかint、1個分多いので、とりあえずstartSizeをコメントアウトしてみた
-// この並び順は、ParticleUpdate.compute bridge-kernelで調査した
+    // sizeof(ParticleSystem.Particle) = 120なので、floatかint、1個分多いので、とりあえずstartSizeをコメントアウトしてみた
+    // この並び順は、ParticleUpdate.compute bridge-kernelで調査した
 };
 
 

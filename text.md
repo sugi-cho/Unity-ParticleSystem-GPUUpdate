@@ -1,0 +1,5 @@
+# ParticleSystemをComputeShaderで制御する(Unity)
+
+UnityのParticleSystem(Shuriken)をComputeShaderで制御する方法について調べました。
+
+ParticleSystemは、パーティクルの色や動きを
