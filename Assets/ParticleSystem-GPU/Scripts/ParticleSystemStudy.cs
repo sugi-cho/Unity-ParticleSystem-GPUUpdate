@@ -59,7 +59,7 @@ public class ParticleSystemStudy : MonoBehaviour
         var num = particleSystem.GetParticles(particleData);
         particleDataBuffer.SetData(particleData, 0, 0, num);
         var kernel = computeBridge.FindKernel("bridge");
-        computeBridge.SetBuffer(kernel, "_ParticlesOUT", particleDataBuffer);
+        computeBridge.SetBuffer(kernel, "_Particles", particleDataBuffer);
         computeBridge.Dispatch(kernel, 1, 1, 1);
         particleDataBuffer.GetData(particleData, 0, 0, num);
 

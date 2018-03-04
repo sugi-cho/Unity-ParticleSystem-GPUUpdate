@@ -225,7 +225,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   updater: {fileID: 7200000, guid: 54f5689a2013a5343944c9de2882ec6b, type: 3}
   pSystem: {fileID: 2094964869}
-  useCPU: 0
+  kernelName: update
+  GPUSetup:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!199 &2094964868
 ParticleSystemRenderer:
   serializedVersion: 4
@@ -241,8 +246,8 @@ ParticleSystemRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: c56dcb1ee8a6f3c498d64ddda01d3049, type: 2}
+  - {fileID: 2100000, guid: c56dcb1ee8a6f3c498d64ddda01d3049, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -347,7 +352,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 20
+      scalar: 5
       minScalar: 0.0001
       maxCurve:
         serializedVersion: 2

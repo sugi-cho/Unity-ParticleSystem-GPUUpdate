@@ -1,23 +1,34 @@
 ﻿#pragma kernel update
 #pragma kernel bridge
+#pragma kernel gathered
 
 #include "ParticleSystem.Particle.cginc"
 
-RWStructuredBuffer<Particle> _ParticlesIN;
-RWStructuredBuffer<Particle> _ParticlesOUT;
+struct vData
+{
+    float3 pos;
+    float3 normal;
+    float2 uv;
+};
+
+RWStructuredBuffer<Particle> _Particles;
+StructuredBuffer<vData> _TargetData;
 float dt;
 float3 mousePos;
 float attraction;
+uint numVerts;
 
 [numthreads(8, 1, 1)]
 void update(uint3 id : SV_DispatchThreadID)
 {
-    Particle p = _ParticlesIN[id.x];
+    Particle p = _Particles[id.x];
     float3 to = mousePos - p.position;
     float dst = max(0.0001, length(to));
-    float3 force = normalize(to) / dst;
+    float3 force = normalize(to) * dst * dt * 10;
     p.velocity += force * attraction;
-    _ParticlesOUT[id.x] = p;
+    //p.velocity *= frac((float)p.randomSeed * dt *0.001);
+    p.startColor = (p.randomSeed & 0x00FFFFFF) + 0xFF000000;
+    _Particles[id.x] = p;
 }
 
 [numthreads(16, 1, 1)]
@@ -35,5 +46,21 @@ void bridge(uint3 id : SV_DispatchThreadID)
     p.randomSeed = 2;
     p.remainingLifetime = 10;
     p.startLifetime = 20;
-    _ParticlesOUT[id.x] = p;
+    _Particles[id.x] = p;
+}
+
+[numthreads(8,1,1)]
+void gathered(uint3 id : SV_DispatchThreadID)
+{
+    Particle p = _Particles[id.x];
+    vData targetData = _TargetData[p.randomSeed % numVerts];
+    float normalizedLifetime = (p.startLifetime - p.remainingLifetime) / p.startLifetime;
+    float3 to = targetData.pos - p.position;
+    float dst = length(to);
+    float3 force = to * 0.1;
+    float t = saturate(2.0 * normalizedLifetime);
+    p.velocity *= (1.0 - t * 0.2);
+    p.velocity += force;
+    p.position = lerp(p.position, targetData.pos, t * t);
+    _Particles[id.x] = p;
 }

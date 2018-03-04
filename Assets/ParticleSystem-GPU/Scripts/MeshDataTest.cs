@@ -24,13 +24,13 @@ public class MeshDataTest : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
+    void FixedUpdate () {
         Graphics.SetRandomWriteTarget(1, vDataBuffer);
         bufferWriter.SetPass(0);
         Graphics.DrawMeshNow(targetMesh, transform.localToWorldMatrix);
         Graphics.ClearRandomWriteTargets();
 
-        vDataBuffer.GetData(dataArray);
+        //vDataBuffer.GetData(dataArray);
 	}
 
     [System.Serializable]

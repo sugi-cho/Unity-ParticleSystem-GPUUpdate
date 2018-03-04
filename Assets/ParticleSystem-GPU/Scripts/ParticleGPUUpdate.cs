@@ -1,20 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ParticleGPUUpdate : MonoBehaviour
 {
 
     public ComputeShader updater;
     public ParticleSystem pSystem;
-    public bool useCPU;
+    public string kernelName = "update";
+    public UnityEvent GPUSetup;
 
-    ParticleSystem.Particle[] particlesIN;
-    ParticleSystem.Particle[] particlesOUT;
+    ParticleSystem.Particle[] particles;
 
-    ComputeBuffer particlesINBuffer;
-    ComputeBuffer particlesOUTBuffer;
+    ComputeBuffer particlesDataBuffer;
     new Camera camera;
 
     Vector3 mousePos;
@@ -24,69 +22,46 @@ public class ParticleGPUUpdate : MonoBehaviour
     void Start()
     {
         var maxParticles = pSystem.main.maxParticles;
-        particlesIN = new ParticleSystem.Particle[maxParticles];
-        particlesOUT = new ParticleSystem.Particle[maxParticles];
+        particles = new ParticleSystem.Particle[maxParticles];
 
         var structSize = Marshal.SizeOf(typeof(ParticleSystem.Particle));
-        particlesINBuffer = new ComputeBuffer(maxParticles, structSize);
-        particlesOUTBuffer = new ComputeBuffer(maxParticles, structSize);
+        particlesDataBuffer = new ComputeBuffer(maxParticles, structSize);
         camera = Camera.main;
-
-        //Debug.Log(structSize); => 120
     }
     private void OnDestroy()
     {
-        if (particlesINBuffer != null)
-            particlesINBuffer.Release();
-        if (particlesOUTBuffer != null)
-            particlesOUTBuffer.Release();
+        if (particlesDataBuffer != null)
+            particlesDataBuffer.Release();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         mousePos = Input.mousePosition;
         mousePos.z = 15f;
         mousePos = camera.ScreenToWorldPoint(mousePos);
         attraction = Input.GetMouseButton(0) ? 0.5f : 0f;
 
-        if (useCPU)
-            CPUUpdate();
-        else
-            GPUUpdate();
+        GPUUpdate();
     }
 
     void GPUUpdate()
     {
-        var numParticles = pSystem.GetParticles(particlesIN);
-        var kernel = updater.FindKernel("update");
+        GPUSetup.Invoke();
+
+        var numParticles = pSystem.GetParticles(particles);
+        var kernel = updater.FindKernel(kernelName);
         var threadsX = Mathf.CeilToInt(numParticles / 8f);
 
-        particlesINBuffer.SetData(particlesIN, 0, 0, numParticles);
-        updater.SetBuffer(kernel, "_ParticlesIN", particlesINBuffer);
-        updater.SetBuffer(kernel, "_ParticlesOUT", particlesOUTBuffer);
+        particlesDataBuffer.SetData(particles, 0, 0, numParticles);
+        updater.SetBuffer(kernel, "_Particles", particlesDataBuffer);
 
         updater.SetVector("mousePos", mousePos);
         updater.SetFloat("attraction", attraction);
+        updater.SetFloat("dt", Time.fixedDeltaTime);
 
         updater.Dispatch(kernel, threadsX, 1, 1);
-        particlesOUTBuffer.GetData(particlesOUT, 0, 0, numParticles);
+        particlesDataBuffer.GetData(particles, 0, 0, numParticles);
 
-        pSystem.SetParticles(particlesOUT, numParticles);
-    }
-
-    void CPUUpdate()
-    {
-        var numParticles = pSystem.GetParticles(particlesIN);
-        for (var i = 0; i < numParticles; i++)
-        {
-            var p = particlesIN[i];
-
-            var to = mousePos - p.position;
-            var dst = Mathf.Max(0.0001f, to.magnitude);
-            var force = to.normalized / dst;
-            p.velocity += force * attraction;
-            particlesOUT[i] = p;
-        }
-        pSystem.SetParticles(particlesOUT, numParticles);
+        pSystem.SetParticles(particles, numParticles);
     }
 }
